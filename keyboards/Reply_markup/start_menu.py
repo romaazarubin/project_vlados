@@ -35,3 +35,15 @@ menu_back_main = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
+menu_basic = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text='Оплатить и выставить'),
+        ],
+        [
+            KeyboardButton(text='Отменить выставление, удалить товар')
+        ]
+    ],
+    resize_keyboard=True
+)

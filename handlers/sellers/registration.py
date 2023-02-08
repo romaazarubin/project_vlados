@@ -1,7 +1,7 @@
 from aiogram.dispatcher.filters import Command, Text
 from main import dp, bot, db
 from aiogram.types import Message, CallbackQuery, MediaGroup, InputFile, LabeledPrice
-from keyboards.menu_basic.start_menu import menu_back_main
+#from keyboards.menu_basic.start_menu import menu_back_main
 #from keyboards.seller_menu.entry_menu import firts_lvl, finish_registration
 from aiogram.dispatcher import FSMContext
 from state.state_registr import Registration

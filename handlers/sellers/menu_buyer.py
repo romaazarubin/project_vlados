@@ -2,9 +2,9 @@ from aiogram.dispatcher.filters import Command, Text
 from main import dp, bot, db
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import Message, CallbackQuery, MediaGroup, InputFile, LabeledPrice, ReplyKeyboardRemove
-from keyboards.seller_menu.entry_menu import product_display
-from keyboards.buyer_menu.basic_menu import menu_basic
-from keyboards.Reply_markup.start_menu import seller_menu, menu, menu_back_main
+# from keyboards.seller_menu.entry_menu import product_display
+#from keyboards.buyer_menu.basic_menu import menu_basic
+from keyboards.Reply_markup.start_menu import seller_menu, menu, menu_back_main, menu_basic
 from aiogram.dispatcher import FSMContext
 from state.state_buy import Buy
 
@@ -52,7 +52,7 @@ async def name_buyer(message: Message, state: FSMContext):
 async def val(message: Message, state: FSMContext):
     value = int(message.text)
     data = await state.get_data()
-    quantity = await db.quantity(data['name'])
+    #quantity = await db.quantity(data['name'])
     if value > int(quantity):
         await bot.send_message(message.from_user.id, text='Вы привысили количество товара')
         #await Buy.step_search.set()
@@ -74,7 +74,7 @@ async def val(message: Message, state: FSMContext):
                                                           f',указав в информации платежа свой ник тг, '
                                                           f'и дождитесь отправки товара',
                                reply_markup=menu)
-        await db.edit_quantity(cart[2], value)
+        #await db.edit_quantity(cart[2], value)
         await bot.send_message(cart[2], text=f'{message.from_user.username} оплачивает товар на кошелек {cart[1]} '
                                              f'в размере {int(cart[0]) * value}')
         await state.finish()

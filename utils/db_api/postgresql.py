@@ -20,11 +20,12 @@ class DataBase:
         return await self.pool.execute("INSERT INTO seller (user_id, name_tg, premium) "
                                         "VALUES ($1, $2, $3)", str(user_id), name_tg, False)
 
-    async def add_good(self, user_id, name_tg, name_good, quantity, rate):
-        return await self.pool.execute("INSERT INTO good (user_id, name_tg, name_good, quantity, rate, status) "
-                                       "VALUES ($1,$2,$3,$4,$5,$6)", str(user_id), name_tg, name_good, int(quantity), rate, False)
-    # async def presence_user(self, user_id):
-    #     return await self.pool.fetchval("SELECT login FROM tt WHERE user_id = $1", str(user_id))
+    async def add_good(self, user_id, name_tg, name_good, quantity, rate, wallet):
+        return await self.pool.execute("INSERT INTO good (user_id, name_tg, name_good, quantity, rate, status, wallet) "
+                                       "VALUES ($1,$2,$3,$4,$5,$6,$7)", str(user_id), name_tg, name_good, int(quantity), rate, False, wallet)
+
+    async def presence_user(self, user_id):
+         return await self.pool.fetchval("SELECT login FROM tt WHERE user_id = $1", str(user_id))
     #
     # async def registration_user(self, user_id, username, login, password):
     #     return await self.pool.execute("INSERT INTO tt (user_id, name_tg, login, password, premium) "
