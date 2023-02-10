@@ -1,94 +1,201 @@
 from aiogram.dispatcher.filters import Command, Text
 from main import dp, bot, db
 from aiogram.types import Message, CallbackQuery, MediaGroup, InputFile, LabeledPrice, ReplyKeyboardRemove
-#from keyboards.menu_basic.start_menu import menu_back_main
-#from keyboards.seller_menu.entry_menu import seller_menu, menu_basic
+# from keyboards.buyer_menu.basic_menu import menu_basic_not_buy
+# from keyboards.seller_menu.entry_menu import seller_menu, menu_basic
 from keyboards.Reply_markup.start_menu import menu_back_main, seller_menu, menu, menu_basic
+from keyboards.Reply_markup.stop_prod import menu_stop
 from keyboards.admin_keyboard.admin import genmarkup
 from aiogram.dispatcher import FSMContext
 from state.state_sell import Sell
-
-
+from keyboards.seller_menu.product import menu_product
+from config import admin_id
 
 
 @dp.message_handler(Text(equals='Продавец'))
 async def seller(message: Message):
-    #await db.add_user(message.from_user.id, message.from_user.username)
-    await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+    try:
+        await db.add_user(message.from_user.id, message.from_user.username)
+    except Exception as e:
+        pass
+    finally:
+        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+
 
 @dp.message_handler(Text(equals='Выставить на продажу'), state=None)
 async def sale(message: Message):
-    await bot.send_message(message.from_user.id, text='Введите название товара', reply_markup=ReplyKeyboardRemove())
+    await bot.send_message(message.from_user.id, text='Введите название товара, максимальная длинна 10 симповолов',
+                           reply_markup=menu_stop)
     await Sell.step_name.set()
+
+
+@dp.message_handler(Text(equals='Мои товары'))
+async def cart(message: Message):
+    try:
+        cart_product = await db.cart(message.from_user.id)
+        await bot.send_message(message.from_user.id, text='Ваши товары',
+                               reply_markup=menu_product(cart_product, message.from_user.id))
+    except:
+        await bot.send_message(message.from_user.id, text='Произошла ошибка')
 
 
 @dp.message_handler(state=Sell.step_name)
 async def state_name(message: Message, state: FSMContext):
-    name = message.text
-    await state.update_data(
-        {
-            'name': name
-        }
-    )
-    await bot.send_message(message.from_user.id, text='Введите количество товара')
-    await Sell.step_quantity.set()
+    name = message.text.lower()
+    if message.text == 'Отменить выставлениe':
+        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+        await state.finish()
+
+    else:
+        if name.isdecimal():
+            await bot.send_message(message.from_user.id, text='Название товара должны быть буквами! повторите попытку')
+            await Sell.step_name.set()
+        else:
+            if len(name) > 10:
+                await bot.send_message(message.from_user.id,
+                                       text='Вы превысили длинну, введите название товара повторно')
+                await Sell.step_name.set()
+            else:
+                await state.update_data(
+                    {
+                        'name': name
+                    }
+                )
+                await bot.send_message(message.from_user.id, text='Введите количество товара, если число не целое, '
+                                                                  'то вводите через точку')
+                await Sell.step_quantity.set()
+
 
 @dp.message_handler(state=Sell.step_quantity)
 async def sell_step_quantity(message: Message, state: FSMContext):
-    quantity = message.text
-    await state.update_data(
-        {
-            'quantity': quantity
-        }
-    )
-    await bot.send_message(message.from_user.id, text='Введите курс')
+    quantity = message.text.lower()
+    if message.text == 'Отменить выставлениe':
+        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+        await state.finish()
 
-    await Sell.step_rate.set()
+    else:
+        if quantity.replace(".", "").isdigit():
+            if len(quantity) > 10:
+                await bot.send_message(message.from_user.id,
+                                       text='Вы превысили длинну, введите количество товара повторно')
+                await Sell.step_quantity.set()
+            else:
+                await state.update_data(
+                    {
+                        'quantity': quantity
+                    }
+                )
+                await bot.send_message(message.from_user.id, text='Введите валюту')
+
+                await Sell.step_currency.set()
+        else:
+            await bot.send_message(message.from_user.id, text='Вы ввели не число, повторите попытку')
+            await Sell.step_quantity.set()
+
+
+@dp.message_handler(state=Sell.step_currency)
+async def sell_step_quantity(message: Message, state: FSMContext):
+    currency = message.text.lower()
+    if message.text == 'Отменить выставлениe':
+        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+        await state.finish()
+    else:
+        if currency.isdecimal():
+            await bot.send_message(message.from_user.id, text='Курс должнен состоять из букв! повторите попытку')
+            await Sell.step_currency.set()
+        else:
+            if len(currency) > 10:
+                await bot.send_message(message.from_user.id,
+                                       text='Вы превысили длинну, введите количество товара повторно')
+                await Sell.step_quantity.set()
+            else:
+                await state.update_data(
+                    {
+                        'currency': currency
+                    }
+                )
+                await bot.send_message(message.from_user.id, text='Введите курс, если число не целое, '
+                                                                  'то вводите через точку')
+
+                await Sell.step_rate.set()
 
 
 @dp.message_handler(state=Sell.step_rate)
 async def sell_step_rate(message: Message, state: FSMContext):
-    rate = message.text
-    await state.update_data(
-        {
-            'rate': rate
-        }
-    )
-    await bot.send_message(message.from_user.id, text='Введите ваш кошелек')
-    await Sell.step_wallet.set()
+    rate = message.text.lower()
+    if message.text == 'Отменить выставлениe':
+        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+        await state.finish()
+
+    else:
+        if rate.replace(".", "").isdigit():
+            if len(rate) > 10:
+                await bot.send_message(message.from_user.id, text='Вы превысили длинну, введите курс товара повторно')
+                await Sell.step_rate.set()
+            else:
+                await state.update_data(
+                    {
+                        'rate': rate
+                    }
+                )
+                await bot.send_message(message.from_user.id, text='Введите ваш кошелек')
+                await Sell.step_wallet.set()
+        else:
+            await bot.send_message(message.from_user.id, text='Вы ввели не число')
+            await Sell.step_rate.set()
+
 
 @dp.message_handler(state=Sell.step_wallet)
 async def sell_step_wallet(message: Message, state: FSMContext):
-    wallet = message.text
-    await state.update_data(
-        {
-            'wallet': wallet
-        }
-    )
-    data = await state.get_data()
-    await bot.send_message(message.from_user.id, text=f"Товар: {data.get('name')}\n"
-                                                      f"Количество: {data.get('quantity')}\n"
-                                                      f"Курс: {data.get('rate')}\n"
-                                                      f"Кошелек: {data.get('wallet')}\n"
-                                                      f"Выставление товара платное. Оплатите 5$ на счет "
-                                                      f"543567834573",
-                           reply_markup=menu_basic)
-    await Sell.step_pay.set()
+    try:
+        if message.text == 'Отменить выставлениe':
+            await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+            await state.finish()
+        else:
+            rows = await db.take_price(admin_id=admin_id)
+            for i in rows:
+                price = i['price']
+                currency = i['currency']
+            wallet = message.text.lower()
+            await state.update_data(
+                {
+                    'wallet': wallet
+                }
+            )
+            data = await state.get_data()
+            await bot.send_message(message.from_user.id, text=f"Товар: {data.get('name')}\n"
+                                                              f"Количество: {data.get('quantity')}\n"
+                                                              f"Курс: {data.get('rate')}\n"
+                                                              f"Кошелек: {data.get('wallet')}\n"
+                                                              f"Выставление товара платное. Оплатите {price} {currency} на счет "
+                                                              f"543567834573",
+                                   reply_markup=menu_basic)
+            await Sell.step_pay.set()
+    except:
+        await bot.send_message(message.from_user.id, 'Произошла ошибка', reply_markup=seller_menu)
+        await state.finish()
+
 
 @dp.message_handler(state=Sell.step_pay)
 async def sell_step_pay(message: Message, state: FSMContext):
     data = await state.get_data()
-    #await bot.send_message(message.from_user.id, text="..", reply_markup=ReplyKeyboardRemove())
     if message.text == 'Оплатить и выставить':
-        await bot.send_message(454279273,
-                               text='Такой пользователь',
-                               reply_markup=genmarkup(message.from_user.id, data.get('name')))
-        #await db.add_good(message.from_user.id, message.from_user.username, data.get('name'), data.get('quantity'),
-                          #data.get('rate'), data.get('wallet'))
-        await bot.send_message(message.from_user.id,
-                               text='В скором времени администраторы проверят вашу оплату и выставят ваш слот на продажу\n'
-                                    'Проверить выставленный товар можно в меню "Мои товары"',
-                               reply_markup=menu_back_main)
+        try:
+            await db.add_good(message.from_user.id, message.from_user.username, data.get('name'), data.get('quantity'),
+                              data.get('currency'), data.get('rate'), data.get('wallet'))
+            await bot.send_message(admin_id,
+                                   text=f'Пользователь {message.from_user.username} проверяет оплату '
+                                        f'на выставление товара {data.get("name")}',
+                                   reply_markup=genmarkup(message.from_user.id, data.get('name')))
+            await bot.send_message(message.from_user.id,
+                                   text='В скором времени администраторы проверят вашу оплату '
+                                        'и выставят ваш слот на продажу\n'
+                                        'Проверить выставленный товар можно в меню "Мои товары"',
+                                   reply_markup=menu_back_main)
+        except:
+            await bot.send_message(message.from_user.id,
+                                   text='Вы ввели неправильные значение в информации о товаре',
+                                   reply_markup=menu_back_main)
     else:
         await bot.send_message(message.from_user.id, text='товар удален', reply_markup=menu_back_main)
     await state.finish()

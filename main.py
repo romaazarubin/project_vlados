@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher
 import config
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from utils.db_api.postgresql import DataBase
-
+from handlers.all_users.description import set_default_commands
 
 
 
