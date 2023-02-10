@@ -1,6 +1,6 @@
 from aiogram.dispatcher.filters import Command, Text
 from main import dp, bot, db
-from aiogram.types import Message, CallbackQuery, MediaGroup, InputFile, LabeledPrice
+from aiogram.types import Message
 from keyboards.Reply_markup.start_menu import menu
 from aiogram.dispatcher import FSMContext
 @dp.message_handler(Command('start'))

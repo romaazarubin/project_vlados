@@ -1,8 +1,6 @@
-from aiogram.dispatcher.filters import Command, Text
+from aiogram.dispatcher.filters import Text
 from main import dp, bot, db
-from aiogram.types import Message, CallbackQuery, MediaGroup, InputFile, LabeledPrice, ReplyKeyboardRemove
-# from keyboards.buyer_menu.basic_menu import menu_basic_not_buy
-# from keyboards.seller_menu.entry_menu import seller_menu, menu_basic
+from aiogram.types import Message
 from keyboards.Reply_markup.start_menu import menu_back_main, seller_menu, menu, menu_basic
 from keyboards.Reply_markup.stop_prod import menu_stop
 from keyboards.admin_keyboard.admin import genmarkup

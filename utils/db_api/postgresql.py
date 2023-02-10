@@ -78,3 +78,6 @@ class DataBase:
 
     async def take_price(self, admin_id):
         return await self.pool.fetch('SELECT price, currency FROM admin WHERE user_id=$1', str(admin_id))
+
+    async def add_admin(self, admin_id):
+        return await self.pool.execute("INSERT INTO admin(user_id) VALUES ($1)", str(admin_id))

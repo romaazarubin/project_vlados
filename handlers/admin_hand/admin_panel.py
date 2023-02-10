@@ -1,5 +1,5 @@
 from main import dp, bot, db
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery
 from keyboards.admin_keyboard.admin import cb
 
 

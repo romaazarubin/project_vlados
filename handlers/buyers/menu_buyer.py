@@ -1,6 +1,6 @@
 from aiogram.dispatcher.filters import Text
 from main import dp, bot, db
-from aiogram.types import Message, ReplyKeyboardRemove, ContentType
+from aiogram.types import Message
 from keyboards.buyer_menu.product_list import menu_product_for_buyer
 from keyboards.buyer_menu.basic_menu import menu_basic, menu_basic_not_buy
 from keyboards.Reply_markup.start_menu import menu
@@ -17,14 +17,20 @@ async def buyer(message: Message):
 
 @dp.message_handler(content_types=['text'], state=Registration.step_wallet)
 async def wallet(message: Message, state: FSMContext):
-    try:
-        await db.add_buyer(message.from_user.id, message.from_user.username, message.text)
-    except:
-        await db.update_buyer(message.from_user.id, message.from_user.username, message.text)
-    finally:
-        await bot.send_message(message.from_user.id, text='Нажмите покупку, для поиска продавца',
-                               reply_markup=menu_basic)
+    if message.text == 'Вернуться на главное меню':
         await state.finish()
+        await bot.send_message(chat_id=message.from_user.id,
+                               text='Выберите роль',
+                               reply_markup=menu)
+    else:
+        try:
+            await db.add_buyer(message.from_user.id, message.from_user.username, message.text)
+        except:
+            await db.update_buyer(message.from_user.id, message.from_user.username, message.text)
+        finally:
+            await bot.send_message(message.from_user.id, text='Нажмите покупку, для поиска продавца',
+                                   reply_markup=menu_basic)
+            await state.finish()
 
 
 @dp.message_handler(Text(equals='Покупка'))
@@ -52,7 +58,6 @@ async def name_buyer(message: Message, state: FSMContext):
             await bot.send_message(message.from_user.id, text=f"Все товары {name}'a",
                                    reply_markup=menu_product_for_buyer(rows))
 
-        # await state.finish()
         except:
             await bot.send_message(message.from_user.id, text='произошла ошибка, введите имя продавца')
             await Buy.step_search.set()
