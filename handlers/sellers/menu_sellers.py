@@ -154,6 +154,7 @@ async def sell_step_wallet(message: Message, state: FSMContext):
             for i in rows:
                 price = i['price']
                 currency = i['currency']
+                wallet_admin = i['wallet_admin']
             wallet = message.text.lower()
             await state.update_data(
                 {
@@ -166,7 +167,7 @@ async def sell_step_wallet(message: Message, state: FSMContext):
                                                               f"Курс: {data.get('rate')}\n"
                                                               f"Кошелек: {data.get('wallet')}\n"
                                                               f"Выставление товара платное. Оплатите {price} {currency} "
-                                                              f"на EQCiLjuTGZzqFX8c6W95YtUALFstZ0dYQWvaJjTRtHgz3Nbs кошелек,"
+                                                              f"на {wallet_admin} кошелек,"
                                                               f" в комментарии к транзакции укажите ваше имя в TG",
                                    reply_markup=menu_basic)
             await Sell.step_pay.set()

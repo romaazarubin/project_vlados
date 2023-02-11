@@ -76,13 +76,16 @@ async def change(message: Message, state: FSMContext):
 @dp.message_handler(state=Price_admin.step_price)
 async def change(message: Message, state: FSMContext):
     if message.from_user.id == admin_id:
-        await state.update_data(
-            {
-                'price': message.text
-            }
-        )
-        await bot.send_message(admin_id, text='Введите валюту')
-        await Price_admin.step_currency.set()
+        if len(message.text.split()) > 1:
+            await bot.send_message(admin_id, text='Введите цену без валюты!')
+        else:
+            await state.update_data(
+                {
+                    'price': message.text
+                }
+            )
+            await bot.send_message(admin_id, text='Введите валюту')
+            await Price_admin.step_currency.set()
     else:
         await bot.send_message(message.from_user.id, text='Вы не являетесь админом')
 
@@ -90,9 +93,12 @@ async def change(message: Message, state: FSMContext):
 @dp.message_handler(state=Price_admin.step_currency)
 async def change(message: Message, state: FSMContext):
     if message.from_user.id == admin_id:
-        data = await state.get_data()
-        await db.edit_price_admin(message.from_user.id, data.get('price'), message.text)
-        await state.finish()
-        await bot.send_message(admin_id, text='Изменения сохранены', reply_markup=menu_edit)
+        if len(message.text.split()) > 1:
+            await bot.send_message(admin_id, text='Введите только валюту!')
+        else:
+            data = await state.get_data()
+            await db.edit_price_admin(message.from_user.id, data.get('price'), message.text)
+            await state.finish()
+            await bot.send_message(admin_id, text='Изменения сохранены', reply_markup=menu_edit)
     else:
         await bot.send_message(message.from_user.id, text='Вы не являетесь админом')
