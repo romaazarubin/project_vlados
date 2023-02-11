@@ -11,7 +11,8 @@ class DataBase:
                 user=PGUSER,
                 password=PGPASSWORD,
                 host=ip,
-                port='5432'
+                port='5432',
+                ssl=False
 
             )
         )
