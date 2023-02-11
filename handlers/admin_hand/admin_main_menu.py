@@ -25,8 +25,12 @@ async def start(message: Message):
 @dp.message_handler(Text(equals='Изменить счет оплаты'), state=None)
 async def change(message: Message, state: FSMContext):
     if message.from_user.id == admin_id:
-        await bot.send_message(admin_id, text='Введите номер кошелька', reply_markup=menu_back)
-        await Edit.step_wallet.set()
+        if message.text == 'Вернуться назад':
+            await state.finish()
+            await bot.send_message(admin_id, text='Меню', reply_markup=menu_edit)
+        else:
+            await bot.send_message(admin_id, text='Введите номер кошелька', reply_markup=menu_back)
+            await Edit.step_wallet.set()
     else:
         await bot.send_message(message.from_user.id, text='Вы не являетесь админом')
 
@@ -34,7 +38,7 @@ async def change(message: Message, state: FSMContext):
 @dp.message_handler(state=Edit.step_wallet)
 async def step_wallet(message: Message, state: FSMContext):
     if message.from_user.id == admin_id:
-        if message.text.lower() == 'вернуться назад':
+        if message.text.lower() == 'вернуться назад' or '/' in message.text:
             await bot.send_message(admin_id,
                                    text='Меню',
                                    reply_markup=menu_edit)
@@ -77,15 +81,23 @@ async def change(message: Message, state: FSMContext):
 async def change(message: Message, state: FSMContext):
     if message.from_user.id == admin_id:
         if len(message.text.split()) > 1:
-            await bot.send_message(admin_id, text='Введите цену без валюты! Без пробела!')
+            if message.text == 'Вернуться назад':
+                await state.finish()
+                await bot.send_message(admin_id, text='Меню', reply_markup=menu_edit)
+            else:
+                await bot.send_message(admin_id, text='Введите цену без валюты! Без пробела!')
         else:
-            await state.update_data(
-                {
-                    'price': message.text
-                }
-            )
-            await bot.send_message(admin_id, text='Введите валюту')
-            await Price_admin.step_currency.set()
+            if message.text == '/start' or message.text == '/help' or message.text == '/admin' or '/' in message.text:
+                await state.finish()
+                await bot.send_message(admin_id, text='Меню', reply_markup=menu_edit)
+            else:
+                await state.update_data(
+                    {
+                        'price': message.text
+                    }
+                )
+                await bot.send_message(admin_id, text='Введите валюту')
+                await Price_admin.step_currency.set()
     else:
         await bot.send_message(message.from_user.id, text='Вы не являетесь админом!')
 
@@ -94,11 +106,20 @@ async def change(message: Message, state: FSMContext):
 async def change(message: Message, state: FSMContext):
     if message.from_user.id == admin_id:
         if len(message.text.split()) > 1:
-            await bot.send_message(admin_id, text='Введите только валюту! Без пробела!')
+            if message.text == 'Вернуться назад':
+                await state.finish()
+                await bot.send_message(admin_id, text='Меню', reply_markup=menu_edit)
+            else:
+                await bot.send_message(admin_id, text='Введите только валюту! Без пробела!')
         else:
-            data = await state.get_data()
-            await db.edit_price_admin(message.from_user.id, data.get('price'), message.text)
-            await state.finish()
-            await bot.send_message(admin_id, text='Изменения сохранены', reply_markup=menu_edit)
+            if message.text == '/start' or message.text == '/help' or message.text == '/admin' or '/' in message.text:
+                await state.finish()
+                await bot.send_message(admin_id, text='Меню', reply_markup=menu_edit)
+            else:
+                data = await state.get_data()
+                await db.edit_price_admin(message.from_user.id, data.get('price'), message.text)
+                await state.finish()
+                await bot.send_message(admin_id, text='Изменения сохранены', reply_markup=menu_edit)
+
     else:
         await bot.send_message(message.from_user.id, text='Вы не являетесь админом!')
