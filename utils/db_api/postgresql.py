@@ -1,6 +1,6 @@
 import asyncio
 import asyncpg
-from bot.config import ip, PGUSER, PGPASSWORD, DATABASE
+from config import ip, PGUSER, PGPASSWORD, DATABASE
 
 
 class DataBase:

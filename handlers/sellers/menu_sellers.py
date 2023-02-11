@@ -1,13 +1,13 @@
 from aiogram.dispatcher.filters import Text
-from bot.main import dp, bot, db
+from main import dp, bot, db
 from aiogram.types import Message
-from bot.keyboards.Reply_markup.start_menu import menu_back_main, seller_menu, menu_basic
-from bot.keyboards.Reply_markup.stop_prod import menu_stop
-from bot.keyboards.admin_keyboard.admin import genmarkup
+from keyboards.Reply_markup.start_menu import menu_back_main, seller_menu, menu_basic
+from keyboards.Reply_markup.stop_prod import menu_stop
+from keyboards.admin_keyboard.admin import genmarkup
 from aiogram.dispatcher import FSMContext
-from bot.state.state_sell import Sell
-from bot.keyboards.seller_menu.product import menu_product
-from bot.config import admin_id
+from state.state_sell import Sell
+from keyboards.seller_menu.product import menu_product
+from config import admin_id
 
 
 @dp.message_handler(Text(equals='Продавец'))

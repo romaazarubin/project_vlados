@@ -1,9 +1,9 @@
-from bot.main import dp, bot, db
+from main import dp, bot, db
 from aiogram.types import Message, CallbackQuery
-from bot.state.state_buy import Buy
-from bot.keyboards.Reply_markup.start_menu import menu
-from bot.keyboards.buyer_menu.product_list import cd_value_product, keyboard_buy, cd_buy_product
-from bot.keyboards.seller_menu.product import payment_confirmation
+from state.state_buy import Buy
+from keyboards.Reply_markup.start_menu import menu
+from keyboards.buyer_menu.product_list import cd_value_product, keyboard_buy, cd_buy_product
+from keyboards.seller_menu.product import payment_confirmation
 from aiogram.dispatcher import FSMContext
 
 

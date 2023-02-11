@@ -1,12 +1,12 @@
-from aiogram.dispatcher.filters import Text, Command
-from bot.main import dp, bot, db
+from aiogram.dispatcher.filters import Text
+from main import dp, bot, db
 from aiogram.types import Message
-from bot.keyboards.buyer_menu.product_list import menu_product_for_buyer
-from bot.keyboards.buyer_menu.basic_menu import menu_basic, menu_basic_not_buy
-from bot.keyboards.Reply_markup.start_menu import menu
+from keyboards.buyer_menu.product_list import menu_product_for_buyer
+from keyboards.buyer_menu.basic_menu import menu_basic, menu_basic_not_buy
+from keyboards.Reply_markup.start_menu import menu
 from aiogram.dispatcher import FSMContext
-from bot.state.state_buy import Buy
-from bot.state.state_registr import Registration
+from state.state_buy import Buy
+from state.state_registr import Registration
 
 
 @dp.message_handler(Text(equals='Покупатель'), state=None)

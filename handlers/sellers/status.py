@@ -1,8 +1,8 @@
-from bot.main import dp, bot, db
+from main import dp, bot, db
 from aiogram.types import CallbackQuery
-from bot.keyboards.seller_menu.product import cb_product, cb_status_true, keyboard_status_false, menu_product, \
+from keyboards.seller_menu.product import cb_product, cb_status_true, keyboard_status_false, menu_product, \
     cb_back_to_cart, cb_payment_confirmation
-from bot.keyboards.admin_keyboard.admin import cb, genmarkup
+from keyboards.admin_keyboard.admin import cb, genmarkup
 
 
 @dp.callback_query_handler(cb_product.filter(action='info'))
