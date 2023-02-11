@@ -1,10 +1,10 @@
 from aiogram.dispatcher.filters import Command, Text
-from main import dp, bot, db
+from bot.main import dp, bot, db
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
-from state.state_admin import Edit, Price_admin
-from config import admin_id
-from keyboards.admin_keyboard.edit_data import menu_back, menu_edit
+from bot.state.state_admin import Edit, Price_admin
+from bot.config import admin_id
+from bot.keyboards.admin_keyboard.edit_data import menu_back, menu_edit
 
 
 @dp.message_handler(Command('admin'))

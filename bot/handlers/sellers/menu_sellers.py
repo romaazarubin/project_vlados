@@ -1,13 +1,13 @@
 from aiogram.dispatcher.filters import Text
-from main import dp, bot, db
+from bot.main import dp, bot, db
 from aiogram.types import Message
-from keyboards.Reply_markup.start_menu import menu_back_main, seller_menu, menu, menu_basic
-from keyboards.Reply_markup.stop_prod import menu_stop
-from keyboards.admin_keyboard.admin import genmarkup
+from bot.keyboards.Reply_markup.start_menu import menu_back_main, seller_menu, menu_basic
+from bot.keyboards.Reply_markup.stop_prod import menu_stop
+from bot.keyboards.admin_keyboard.admin import genmarkup
 from aiogram.dispatcher import FSMContext
-from state.state_sell import Sell
-from keyboards.seller_menu.product import menu_product
-from config import admin_id
+from bot.state.state_sell import Sell
+from bot.keyboards.seller_menu.product import menu_product
+from bot.config import admin_id
 
 
 @dp.message_handler(Text(equals='Продавец'))
@@ -40,7 +40,7 @@ async def cart(message: Message):
 @dp.message_handler(state=Sell.step_name)
 async def state_name(message: Message, state: FSMContext):
     name = message.text.lower()
-    if message.text == 'Отменить выставлениe':
+    if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
         await state.finish()
 
@@ -67,7 +67,7 @@ async def state_name(message: Message, state: FSMContext):
 @dp.message_handler(state=Sell.step_quantity)
 async def sell_step_quantity(message: Message, state: FSMContext):
     quantity = message.text.lower()
-    if message.text == 'Отменить выставлениe':
+    if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
         await state.finish()
 
@@ -94,7 +94,7 @@ async def sell_step_quantity(message: Message, state: FSMContext):
 @dp.message_handler(state=Sell.step_currency)
 async def sell_step_quantity(message: Message, state: FSMContext):
     currency = message.text.lower()
-    if message.text == 'Отменить выставлениe':
+    if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
         await state.finish()
     else:
@@ -121,7 +121,7 @@ async def sell_step_quantity(message: Message, state: FSMContext):
 @dp.message_handler(state=Sell.step_rate)
 async def sell_step_rate(message: Message, state: FSMContext):
     rate = message.text.lower()
-    if message.text == 'Отменить выставлениe':
+    if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
         await state.finish()
 
@@ -146,7 +146,7 @@ async def sell_step_rate(message: Message, state: FSMContext):
 @dp.message_handler(state=Sell.step_wallet)
 async def sell_step_wallet(message: Message, state: FSMContext):
     try:
-        if message.text == 'Отменить выставлениe':
+        if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
             await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
             await state.finish()
         else:
@@ -165,8 +165,9 @@ async def sell_step_wallet(message: Message, state: FSMContext):
                                                               f"Количество: {data.get('quantity')}\n"
                                                               f"Курс: {data.get('rate')}\n"
                                                               f"Кошелек: {data.get('wallet')}\n"
-                                                              f"Выставление товара платное. Оплатите {price} {currency} на счет "
-                                                              f"543567834573",
+                                                              f"Выставление товара платное. Оплатите {price} {currency} "
+                                                              f"на EQCiLjuTGZzqFX8c6W95YtUALFstZ0dYQWvaJjTRtHgz3Nbs кошелек,"
+                                                              f" в комментарии к транзакции укажите ваше имя в TG",
                                    reply_markup=menu_basic)
             await Sell.step_pay.set()
     except:
@@ -177,7 +178,7 @@ async def sell_step_wallet(message: Message, state: FSMContext):
 @dp.message_handler(state=Sell.step_pay)
 async def sell_step_pay(message: Message, state: FSMContext):
     data = await state.get_data()
-    if message.text == 'Оплатить и выставить':
+    if message.text == 'Оплатить и выставить' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         try:
             await db.add_good(message.from_user.id, message.from_user.username, data.get('name'), data.get('quantity'),
                               data.get('currency'), data.get('rate'), data.get('wallet'))

@@ -1,12 +1,12 @@
-from aiogram.dispatcher.filters import Text
-from main import dp, bot, db
+from aiogram.dispatcher.filters import Text, Command
+from bot.main import dp, bot, db
 from aiogram.types import Message
-from keyboards.buyer_menu.product_list import menu_product_for_buyer
-from keyboards.buyer_menu.basic_menu import menu_basic, menu_basic_not_buy
-from keyboards.Reply_markup.start_menu import menu
+from bot.keyboards.buyer_menu.product_list import menu_product_for_buyer
+from bot.keyboards.buyer_menu.basic_menu import menu_basic, menu_basic_not_buy
+from bot.keyboards.Reply_markup.start_menu import menu
 from aiogram.dispatcher import FSMContext
-from state.state_buy import Buy
-from state.state_registr import Registration
+from bot.state.state_buy import Buy
+from bot.state.state_registr import Registration
 
 
 @dp.message_handler(Text(equals='Покупатель'), state=None)
@@ -17,7 +17,7 @@ async def buyer(message: Message):
 
 @dp.message_handler(content_types=['text'], state=Registration.step_wallet)
 async def wallet(message: Message, state: FSMContext):
-    if message.text == 'Вернуться на главное меню':
+    if message.text == 'Вернуться на главное меню' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await state.finish()
         await bot.send_message(chat_id=message.from_user.id,
                                text='Выберите роль',
@@ -43,7 +43,7 @@ async def buy(message: Message):
 @dp.message_handler(state=Buy.step_search)
 async def name_buyer(message: Message, state: FSMContext):
     name = message.text.lower()
-    if name == 'вернуться на главное меню':
+    if name == 'вернуться на главное меню' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await state.finish()
     else:
         await state.update_data(

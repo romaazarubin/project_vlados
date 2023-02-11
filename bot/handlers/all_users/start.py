@@ -1,7 +1,7 @@
 from aiogram.dispatcher.filters import Command, Text
-from main import dp, bot, db
+from bot.main import dp, bot
 from aiogram.types import Message
-from keyboards.Reply_markup.start_menu import menu
+from bot.keyboards.Reply_markup.start_menu import menu
 from aiogram.dispatcher import FSMContext
 @dp.message_handler(Command('start'))
 async def start(message: Message):

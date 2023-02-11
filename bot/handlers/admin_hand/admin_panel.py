@@ -1,6 +1,6 @@
-from main import dp, bot, db
+from bot.main import dp, bot, db
 from aiogram.types import CallbackQuery
-from keyboards.admin_keyboard.admin import cb
+from bot.keyboards.admin_keyboard.admin import cb
 
 
 @dp.callback_query_handler(cb.filter(action="add"))

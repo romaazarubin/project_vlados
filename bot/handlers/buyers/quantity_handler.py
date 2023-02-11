@@ -1,9 +1,9 @@
-from main import dp, bot, db
+from bot.main import dp, bot, db
 from aiogram.types import Message, CallbackQuery
-from state.state_buy import Buy
-from keyboards.Reply_markup.start_menu import menu
-from keyboards.buyer_menu.product_list import cd_value_product, keyboard_buy, cd_buy_product
-from keyboards.seller_menu.product import payment_confirmation
+from bot.state.state_buy import Buy
+from bot.keyboards.Reply_markup.start_menu import menu
+from bot.keyboards.buyer_menu.product_list import cd_value_product, keyboard_buy, cd_buy_product
+from bot.keyboards.seller_menu.product import payment_confirmation
 from aiogram.dispatcher import FSMContext
 
 
@@ -22,7 +22,7 @@ async def value(call: CallbackQuery, callback_data: dict, state: FSMContext):
 @dp.message_handler(state=Buy.step_value)
 async def step_value(message: Message, state: FSMContext):
     value_prod = message.text
-    if value_prod.lower() == 'вернуться на главное меню':
+    if message.text == 'Оплатить и выставить' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await state.finish()
         await bot.send_message(message.from_user.id, text='Выберите роль', reply_markup=menu)
     else:

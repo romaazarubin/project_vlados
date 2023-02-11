@@ -1,6 +1,6 @@
-from main import dp, bot, db
-from aiogram.types import Message, CallbackQuery
-from keyboards.buyer_menu.basic_menu import menu_basic
+from bot.main import dp
+from aiogram.types import CallbackQuery
+from bot.keyboards.buyer_menu.basic_menu import menu_basic
 from aiogram.dispatcher import FSMContext
 
 @dp.callback_query_handler(text_contains='back_search_sellers', state=None)

@@ -1,11 +1,8 @@
 import asyncio
 from aiogram import Bot, Dispatcher
-import config
+from bot import config
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from utils.db_api.postgresql import DataBase
-from handlers.all_users.description import set_default_commands
-
-
+from bot.utils.db_api.postgresql import DataBase
 
 loop = asyncio.get_event_loop()
 bot = Bot(str(config.BOT_TOKEN), parse_mode='HTML')
@@ -15,6 +12,6 @@ db = DataBase(loop)
 
 
 if __name__ == '__main__':
-    from handlers import dp
+    from bot.handlers import dp
     from aiogram import executor
     executor.start_polling(dp)
