@@ -10,5 +10,4 @@ PGPASSWORD = os.getenv('PGPASSWORD')
 DATABASE = str(os.getenv('DATABASE'))
 ip = os.getenv('IP')
 admin_id =287378244
-    #454279273
     #548839851

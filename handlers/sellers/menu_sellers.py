@@ -104,8 +104,8 @@ async def sell_step_quantity(message: Message, state: FSMContext):
         else:
             if len(currency) > 10:
                 await bot.send_message(message.from_user.id,
-                                       text='Вы превысили длинну, введите количество товара повторно')
-                await Sell.step_quantity.set()
+                                       text='Вы превысили длинну, введите валюту повторно товара повторно')
+                await Sell.step_currency.set()
             else:
                 await state.update_data(
                     {
