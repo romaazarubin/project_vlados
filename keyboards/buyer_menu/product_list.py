@@ -11,17 +11,16 @@ def menu_product_for_buyer(data):
     for i in data:
         user_id = i['user_id']
         name_good = i['name_good']
-        quatity_good = i['quantity']
+        quantity_good = round((i["quantity"]), 2)
         rate_good = i['rate']
         status = i["status"]
-        quantity = i["quantity"]
         if status:
-            btn_product = InlineKeyboardButton(text=f'Продукт: {name_good}, кол-во: {quatity_good}, курс:{rate_good}',
+            btn_product = InlineKeyboardButton(text=f'Продукт: {name_good}, кол-во: {quantity_good}, курс:{rate_good}',
                                                callback_data=cd_value_product.new(action='value',
                                                                                   user_id=user_id,
                                                                                   name_good=name_good,
                                                                                   rate_good=rate_good,
-                                                                                  quantity=quantity))
+                                                                                  quantity=quantity_good))
             markup.add(btn_product)
     btn_back_search_sellers = InlineKeyboardButton(text='Назад', callback_data='back_search_sellers')
     markup.add(btn_back_search_sellers)

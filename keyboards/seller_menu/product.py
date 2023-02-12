@@ -13,7 +13,7 @@ def menu_product(data, user_id):
     markup.row_width = 4
     for i in data:
         name_good = i['name_good']
-        quatity_good = i['quantity']
+        quatity_good = round(i['quantity'],2)
         rate_good = i['rate']
         status = i["status"]
         currency = i["currency"]

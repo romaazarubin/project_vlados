@@ -41,17 +41,17 @@ async def cart(message: Message):
 async def state_name(message: Message, state: FSMContext):
     name = message.text.lower()
     if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
-        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+        await bot.send_message(message.from_user.id, "Меню", reply_markup=seller_menu)
         await state.finish()
 
     else:
         if name.isdecimal():
-            await bot.send_message(message.from_user.id, text='Название товара должны быть буквами! повторите попытку')
+            await bot.send_message(message.from_user.id, text='Название товара должны быть буквами! повторите попытку', reply_markup=menu_stop)
             await Sell.step_name.set()
         else:
             if len(name) > 10:
                 await bot.send_message(message.from_user.id,
-                                       text='Вы превысили длинну, введите название товара повторно')
+                                       text='Вы превысили длинну, введите название товара повторно', reply_markup=menu_stop)
                 await Sell.step_name.set()
             else:
                 await state.update_data(
@@ -60,19 +60,19 @@ async def state_name(message: Message, state: FSMContext):
                     }
                 )
                 await bot.send_message(message.from_user.id, text='Введите количество товара, если число не целое, '
-                                                                  'то вводите через точку')
+                                                                  'то вводите через точку', reply_markup=menu_stop)
                 await Sell.step_quantity.set()
 
 
 @dp.message_handler(state=Sell.step_quantity)
 async def sell_step_quantity(message: Message, state: FSMContext):
     quantity = message.text.lower()
-    if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
-        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+    if message.text == 'Отменить выставлениe' or '/' in message.text:
+        await bot.send_message(message.from_user.id, "Меню", reply_markup=seller_menu)
         await state.finish()
 
     else:
-        if quantity.replace(".", "").isdigit():
+        if (quantity.replace(".", "").isdigit() or quantity.isdigit()) and float(quantity) != 0:
             if len(quantity) > 10:
                 await bot.send_message(message.from_user.id,
                                        text='Вы превысили длинну, введите количество товара повторно')
@@ -80,14 +80,14 @@ async def sell_step_quantity(message: Message, state: FSMContext):
             else:
                 await state.update_data(
                     {
-                        'quantity': quantity
+                        'quantity': round(float(quantity), 4)
                     }
                 )
                 await bot.send_message(message.from_user.id, text='Введите валюту')
 
                 await Sell.step_currency.set()
         else:
-            await bot.send_message(message.from_user.id, text='Вы ввели не число, повторите попытку')
+            await bot.send_message(message.from_user.id, text='Вы ввели не число, повторите попытку, кол-во не должено быть равно 0')
             await Sell.step_quantity.set()
 
 
@@ -95,11 +95,11 @@ async def sell_step_quantity(message: Message, state: FSMContext):
 async def sell_step_quantity(message: Message, state: FSMContext):
     currency = message.text.lower()
     if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
-        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+        await bot.send_message(message.from_user.id, "Меню", reply_markup=seller_menu)
         await state.finish()
     else:
-        if currency.isdecimal():
-            await bot.send_message(message.from_user.id, text='Курс должнен состоять из букв! повторите попытку')
+        if currency.isdecimal() or currency.isdigit() or currency == 0:
+            await bot.send_message(message.from_user.id, text='Валюта должна состоять из букв! повторите попытку')
             await Sell.step_currency.set()
         else:
             if len(currency) > 10:
@@ -122,18 +122,18 @@ async def sell_step_quantity(message: Message, state: FSMContext):
 async def sell_step_rate(message: Message, state: FSMContext):
     rate = message.text.lower()
     if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
-        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+        await bot.send_message(message.from_user.id, "Меню", reply_markup=seller_menu)
         await state.finish()
 
     else:
-        if rate.replace(".", "").isdigit():
+        if (rate.replace(".", "").isdigit() or rate.isdigit()) and float(rate) != 0:
             if len(rate) > 10:
-                await bot.send_message(message.from_user.id, text='Вы превысили длинну, введите курс товара повторно')
+                await bot.send_message(message.from_user.id, text='Вы превысили длинну, введите курс повторно')
                 await Sell.step_rate.set()
             else:
                 await state.update_data(
                     {
-                        'rate': rate
+                        'rate': round(float(rate), 2)
                     }
                 )
                 await bot.send_message(message.from_user.id, text='Введите ваш кошелек')
@@ -147,7 +147,7 @@ async def sell_step_rate(message: Message, state: FSMContext):
 async def sell_step_wallet(message: Message, state: FSMContext):
     try:
         if message.text == 'Отменить выставлениe' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
-            await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+            await bot.send_message(message.from_user.id, "Меню", reply_markup=seller_menu)
             await state.finish()
         else:
             rows = await db.take_price(admin_id=admin_id)
@@ -180,7 +180,6 @@ async def sell_step_wallet(message: Message, state: FSMContext):
 async def sell_step_pay(message: Message, state: FSMContext):
     data = await state.get_data()
     if message.text == 'Оплатить и выставить' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
-        try:
             await db.add_good(message.from_user.id, message.from_user.username, data.get('name'), data.get('quantity'),
                               data.get('currency'), data.get('rate'), data.get('wallet'))
             await bot.send_message(admin_id,
@@ -191,10 +190,6 @@ async def sell_step_pay(message: Message, state: FSMContext):
                                    text='В скором времени администраторы проверят вашу оплату '
                                         'и выставят ваш слот на продажу\n'
                                         'Проверить выставленный товар можно в меню "Мои товары"',
-                                   reply_markup=menu_back_main)
-        except:
-            await bot.send_message(message.from_user.id,
-                                   text='Вы ввели неправильные значение в информации о товаре',
                                    reply_markup=menu_back_main)
     else:
         await bot.send_message(message.from_user.id, text='товар удален', reply_markup=menu_back_main)

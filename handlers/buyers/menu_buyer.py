@@ -45,6 +45,7 @@ async def name_buyer(message: Message, state: FSMContext):
     name = message.text.lower()
     if name == 'вернуться на главное меню' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await state.finish()
+        await bot.send_message(message.from_user.id, text='выберите роль', reply_markup=menu)
     else:
         await state.update_data(
             {
@@ -56,7 +57,7 @@ async def name_buyer(message: Message, state: FSMContext):
             rows = await db.good(name)
             await state.finish()
             await bot.send_message(message.from_user.id, text=f"Все товары {name}'a",
-                                   reply_markup=menu_product_for_buyer(rows))
+                               reply_markup=menu_product_for_buyer(rows))
 
         except:
             await bot.send_message(message.from_user.id, text='произошла ошибка, введите имя продавца')

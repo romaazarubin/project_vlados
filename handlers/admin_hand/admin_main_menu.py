@@ -80,12 +80,12 @@ async def change(message: Message, state: FSMContext):
 @dp.message_handler(state=Price_admin.step_price)
 async def change(message: Message, state: FSMContext):
     if message.from_user.id == admin_id:
-        if len(message.text.split()) > 1:
+        if len(message.text.split()) > 1 or not message.text.replace('.', '').isdigit():
             if message.text == 'Вернуться назад':
                 await state.finish()
                 await bot.send_message(admin_id, text='Меню', reply_markup=menu_edit)
             else:
-                await bot.send_message(admin_id, text='Введите цену без валюты! Без пробела!')
+                await bot.send_message(admin_id, text='Введите цену цифрыми и без валюты! Без пробела!')
         else:
             if message.text == '/start' or message.text == '/help' or message.text == '/admin' or '/' in message.text:
                 await state.finish()
@@ -93,7 +93,7 @@ async def change(message: Message, state: FSMContext):
             else:
                 await state.update_data(
                     {
-                        'price': message.text
+                        'price': round(float(message.text), 2)
                     }
                 )
                 await bot.send_message(admin_id, text='Введите валюту')
@@ -105,21 +105,24 @@ async def change(message: Message, state: FSMContext):
 @dp.message_handler(state=Price_admin.step_currency)
 async def change(message: Message, state: FSMContext):
     if message.from_user.id == admin_id:
-        if len(message.text.split()) > 1:
+        if len(message.text.split()) > 1 or message.text.isdigit() or message.text.replace('.', '').isdigit():
             if message.text == 'Вернуться назад':
                 await state.finish()
                 await bot.send_message(admin_id, text='Меню', reply_markup=menu_edit)
             else:
-                await bot.send_message(admin_id, text='Введите только валюту! Без пробела!')
+                await bot.send_message(admin_id, text='Введите только валюту и буквами! Без пробела!')
         else:
             if message.text == '/start' or message.text == '/help' or message.text == '/admin' or '/' in message.text:
                 await state.finish()
                 await bot.send_message(admin_id, text='Меню', reply_markup=menu_edit)
             else:
                 data = await state.get_data()
-                await db.edit_price_admin(message.from_user.id, data.get('price'), message.text)
-                await state.finish()
-                await bot.send_message(admin_id, text='Изменения сохранены', reply_markup=menu_edit)
-
+                try:
+                    await db.edit_price_admin(message.from_user.id, data.get('price'), message.text)
+                    await state.finish()
+                    await bot.send_message(admin_id, text='Изменения сохранены', reply_markup=menu_edit)
+                except:
+                    await bot.send_message(admin_id, text='Вы ошиблись в вводе данных, повторите попытку!', reply_markup=menu_edit)
+                    await state.finish()
     else:
         await bot.send_message(message.from_user.id, text='Вы не являетесь админом!')

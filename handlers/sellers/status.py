@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery
 from keyboards.seller_menu.product import cb_product, cb_status_true, keyboard_status_false, menu_product, \
     cb_back_to_cart, cb_payment_confirmation
 from keyboards.admin_keyboard.admin import cb, genmarkup
+from config import admin_id
 
 
 @dp.callback_query_handler(cb_product.filter(action='info'))
@@ -36,7 +37,7 @@ async def delete_product(call: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(cb_status_true.filter(status='unconfirmed'))
 async def uncinfirmed(call: CallbackQuery, callback_data: dict):
     await call.message.answer('Запрос отправлен на проверку повторно')
-    await bot.send_message(454279273,
+    await bot.send_message(admin_id,
                            text=f'Пользователь {call.from_user.username} проверяет оплату '
                                 f'на выставление товара {callback_data.get("good")}',
 
@@ -48,7 +49,7 @@ async def payment_confirmation(call: CallbackQuery, callback_data: dict):
     await call.message.edit_text(text='Операция прошла успешно')
     await bot.send_message(callback_data.get('user_id'), text='Продавец отправил вам товар')
     quantity = await db.check_value(call.from_user.id, callback_data.get('name_good'))
-    if int(quantity) == 0:
+    if round(quantity, 2) < 0.1:
         await db.delete_product(call.from_user.id, callback_data.get('name_good'))
 
 

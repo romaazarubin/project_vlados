@@ -23,7 +23,7 @@ class DataBase:
 
     async def add_good(self, user_id, name_tg, name_good, quantity,currency, rate, wallet):
         return await self.pool.execute("INSERT INTO good (user_id, name_tg, name_good, quantity,currency, rate, wallet, status) "
-                                       "VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", str(user_id), name_tg, name_good, int(quantity),
+                                       "VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", str(user_id), name_tg, name_good, quantity,
                                        currency, rate, wallet, False)
 
     async def presence_user(self, user_id):
@@ -46,7 +46,7 @@ class DataBase:
 
     async def edit_value_buyer(self, user_id, name_good, value):
         return await self.pool.execute("UPDATE good SET quantity = quantity - $1 WHERE user_id = $2 and name_good = $3",
-                                       int(value), str(user_id), name_good)
+                                       value, str(user_id), name_good)
 
     async def check_value(self, user_id, name_good):
         return await self.pool.fetchval("SELECT quantity FROM good WHERE user_id = $1 and name_good = $2",
@@ -67,7 +67,7 @@ class DataBase:
 
     async def edit_value_seller(self, user_id, name_good, value):
         return await self.pool.execute("UPDATE good SET quantity = quantity + $1 WHERE user_id = $2 and name_good = $3",
-                                       int(value), str(user_id), name_good)
+                                       float(value), str(user_id), name_good)
     async def edit_wallet_admin(self, admin_id, wallet):
         return await self.pool.execute('UPDATE admin SET wallet_admin=$1 where user_id=$2', str(wallet), str(admin_id))
 
