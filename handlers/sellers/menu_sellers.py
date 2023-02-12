@@ -12,12 +12,16 @@ from config import admin_id
 
 @dp.message_handler(Text(equals='Продавец'))
 async def seller(message: Message):
-    try:
-        await db.add_user(message.from_user.id, message.from_user.username)
-    except Exception as e:
-        pass
-    finally:
-        await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+    k = await db.presence_user(message.from_user.id)
+    if not k:
+        try:
+            await db.add_user(message.from_user.id, message.from_user.username)
+        except Exception as e:
+            pass
+        finally:
+            await bot.send_message(message.from_user.id, message.text, reply_markup=seller_menu)
+    else:
+        await bot.send_message(message.from_user.id, f'{message.text}', reply_markup=seller_menu)
 
 
 @dp.message_handler(Text(equals='Выставить на продажу'), state=None)

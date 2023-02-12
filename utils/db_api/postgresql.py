@@ -27,7 +27,10 @@ class DataBase:
                                        currency, rate, wallet, False)
 
     async def presence_user(self, user_id):
-        return await self.pool.fetchval("SELECT login FROM tt WHERE user_id = $1", str(user_id))
+        return await self.pool.fetchval("SELECT EXISTS(SELECT user_id FROM seller WHERE user_id = $1)", str(user_id))
+
+    async def presence_buyer(self, user_id):
+        return await self.pool.fetchval("SELECT EXISTS(SELECT user_id FROM buyer WHERE user_id = $1)", str(user_id))
 
     async def confirmation(self, user_id, name_good, boolean):
         return await self.pool.execute("UPDATE good SET status = $3 WHERE user_id = $1 and name_good = $2",

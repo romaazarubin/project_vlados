@@ -17,17 +17,20 @@ async def buyer(message: Message):
 
 @dp.message_handler(content_types=['text'], state=Registration.step_wallet)
 async def wallet(message: Message, state: FSMContext):
+    k = await db.presence_buyer(message.from_user.id)
     if message.text == 'Вернуться на главное меню' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
         await state.finish()
         await bot.send_message(chat_id=message.from_user.id,
                                text='Выберите роль',
                                reply_markup=menu)
     else:
-        try:
+        if not k:
             await db.add_buyer(message.from_user.id, message.from_user.username, message.text)
-        except:
+            await bot.send_message(message.from_user.id, text='Нажмите покупку, для поиска продавца',
+                                   reply_markup=menu_basic)
+            await state.finish()
+        else:
             await db.update_buyer(message.from_user.id, message.from_user.username, message.text)
-        finally:
             await bot.send_message(message.from_user.id, text='Нажмите покупку, для поиска продавца',
                                    reply_markup=menu_basic)
             await state.finish()
