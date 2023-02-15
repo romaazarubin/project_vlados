@@ -2,10 +2,12 @@ from main import dp, bot, db
 from aiogram.types import Message, CallbackQuery
 from state.state_buy import Buy
 from keyboards.Reply_markup.start_menu import menu
-from keyboards.buyer_menu.product_list import cd_value_product, keyboard_buy, cd_buy_product
+from keyboards.buyer_menu.product_list import cd_value_product, keyboard_buy, cd_buy_product, cd_good_next_menu, \
+    cd_good_back_menu, all_product, cd_all_menu
 from keyboards.seller_menu.product import payment_confirmation
 from aiogram.dispatcher import FSMContext
 import re
+from keyboards.buyer_menu.basic_menu import menu_basic
 
 
 @dp.callback_query_handler(cd_value_product.filter(action='value'))
@@ -82,6 +84,39 @@ async def buy(call: CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(text_contains='btn_back_main_menu')
-async def btn_back_main_menu(call: CallbackQuery):
+async def btn_back_main_menu(call: CallbackQuery, state: FSMContext):
+    await state.finish()
     await call.message.edit_text(text='Вы отменили покупку', reply_markup=None)
     await call.message.answer(text='Выберите роль', reply_markup=menu)
+
+
+# @dp.callback_query_handler(text_contains='btn_back_main_menu', state=Buy.step_search)
+# async def btn_back_main_menu(call: CallbackQuery, state: FSMContext):
+#     await state.finish()
+#     await call.message.answer(text='Нажмите покупку, для поиска товара',
+#                               reply_markup=menu_basic)
+@dp.callback_query_handler(cd_good_next_menu.filter(action='next'))
+async def next_menu(call: CallbackQuery, callback_data: dict):
+    data = await db.all_good(int(callback_data.get('step')))
+    count = await db.count_good()
+    await call.message.edit_reply_markup(reply_markup=all_product(data, count, int(callback_data.get('step'))))
+
+@dp.callback_query_handler(cd_good_back_menu.filter(action='back'))
+async def back_menu(call: CallbackQuery, callback_data: dict):
+    data = await db.all_good(int(callback_data.get('step')))
+    count = await db.count_good()
+    await call.message.edit_reply_markup(reply_markup=all_product(data, count, int(callback_data.get('step'))))
+
+@dp.callback_query_handler(cd_all_menu.filter(action='value'))
+async def value(call: CallbackQuery, callback_data: dict, state: FSMContext):
+    await state.update_data(
+        {
+            'user_id': callback_data.get('user_id'),
+            'name_good': callback_data.get('name_good'),
+            'rate_good': callback_data.get('rate_good'),
+            'value': callback_data.get('quantity')
+        }
+    )
+    await call.message.answer(
+        text='Введите количество товара, если количество товара не целое число, то введите через точку')
+    await Buy.step_value.set()

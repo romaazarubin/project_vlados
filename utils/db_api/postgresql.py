@@ -43,9 +43,9 @@ class DataBase:
     async def delete_product(self, user_id, name_good):
         return await self.pool.execute("DELETE FROM good WHERE user_id=$1 and name_good=$2", str(user_id), name_good)
 
-    async def good(self, name_tg):
+    async def good(self, name_good):
         return await self.pool.fetch(
-            "SELECT user_id, name_good, quantity, rate, status, wallet FROM good WHERE name_tg = $1", name_tg)
+            "SELECT user_id, name_tg, name_good, quantity, rate, status, wallet FROM good WHERE name_good = $1", name_good)
 
     async def edit_value_buyer(self, user_id, name_good, value):
         return await self.pool.execute("UPDATE good SET quantity = quantity - $1 WHERE user_id = $2 and name_good = $3",
@@ -85,3 +85,9 @@ class DataBase:
 
     async def add_admin(self, admin_id):
         return await self.pool.execute("INSERT INTO admin(user_id) VALUES ($1)", str(admin_id))
+
+    async def all_good(self, k):
+        return await self.pool.fetch("SELECT user_id, name_good, quantity, rate, status, wallet FROM good LIMIT $1 OFFSET $2", 5, k)
+
+    async def count_good(self):
+        return await self.pool.fetchval("SELECT count(*) FROM good")

@@ -156,7 +156,7 @@ async def sell_step_wallet(message: Message, state: FSMContext):
         else:
             rows = await db.take_price(admin_id=admin_id)
             for i in rows:
-                price = i['price']
+                price = round(i['price'], 2)
                 currency = i['currency']
                 wallet_admin = i['wallet_admin']
             wallet = message.text.lower()
