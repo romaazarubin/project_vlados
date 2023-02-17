@@ -13,7 +13,7 @@ def menu_product_for_buyer(data):
         user_id = i['user_id']
         name_good = i['name_good']
         quantity_good = round((i["quantity"]), 2)
-        rate_good = i['rate']
+        rate_good = round(i['rate'], 2)
         status = i["status"]
         if status:
             btn_product = InlineKeyboardButton(text=f'Продукт: {name_good}, кол-во: {quantity_good}, курс:{rate_good}',
@@ -49,7 +49,7 @@ def all_product(data, count, step=0):
         user_id = i['user_id']
         name_good = i['name_good']
         quantity_good = round((i["quantity"]), 2)
-        rate_good = i['rate']
+        rate_good = round(i['rate'], 2)
         status = i["status"]
         if status:
             btn_product = InlineKeyboardButton(text=f'Продукт: {name_good}, кол-во: {quantity_good}, курс:{rate_good}',

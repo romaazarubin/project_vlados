@@ -9,5 +9,5 @@ PGUSER = os.getenv('PGUSER')
 PGPASSWORD = os.getenv('PGPASSWORD')
 DATABASE = str(os.getenv('DATABASE'))
 ip = os.getenv('IP')
-admin_id =454279273
+admin_id =287378244
     #548839851

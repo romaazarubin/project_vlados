@@ -74,5 +74,5 @@ async def name_buyer(message: Message, state: FSMContext):
                                    reply_markup=menu_product_for_buyer(rows))
 
         except:
-            await bot.send_message(message.from_user.id, text='произошла ошибка, введите имя продавца')
+            await bot.send_message(message.from_user.id, text='произошла ошибка, введите название товара повторно')
             await Buy.step_search.set()

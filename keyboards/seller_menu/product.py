@@ -15,7 +15,7 @@ def menu_product(data, user_id):
     for i in data:
         name_good = i['name_good']
         quatity_good = round(i['quantity'],2)
-        rate_good = i['rate']
+        rate_good = round(i['rate'],2)
         status = i["status"]
         currency = i["currency"]
         btn_product = InlineKeyboardButton(text=f'Продукт: {name_good}, кол-во: {quatity_good}, курс:{rate_good}',

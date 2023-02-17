@@ -50,12 +50,14 @@ async def state_name(message: Message, state: FSMContext):
 
     else:
         if name.isdecimal():
-            await bot.send_message(message.from_user.id, text='Название товара должны быть буквами! повторите попытку', reply_markup=menu_stop)
+            await bot.send_message(message.from_user.id, text='Название товара должны быть буквами! повторите попытку',
+                                   reply_markup=menu_stop)
             await Sell.step_name.set()
         else:
             if len(name) > 10:
                 await bot.send_message(message.from_user.id,
-                                       text='Вы превысили длинну, введите название товара повторно', reply_markup=menu_stop)
+                                       text='Вы превысили длинну, введите название товара повторно',
+                                       reply_markup=menu_stop)
                 await Sell.step_name.set()
             else:
                 await state.update_data(
@@ -91,7 +93,8 @@ async def sell_step_quantity(message: Message, state: FSMContext):
 
                 await Sell.step_currency.set()
         else:
-            await bot.send_message(message.from_user.id, text='Вы ввели не число, повторите попытку, кол-во не должено быть равно 0')
+            await bot.send_message(message.from_user.id,
+                                   text='Вы ввели не число, повторите попытку, кол-во не должено быть равно 0')
             await Sell.step_quantity.set()
 
 
@@ -156,7 +159,10 @@ async def sell_step_wallet(message: Message, state: FSMContext):
         else:
             rows = await db.take_price(admin_id=admin_id)
             for i in rows:
-                price = round(i['price'], 2)
+                if i['price'] == None:
+                    price = 0
+                else:
+                    price = round(i['price'], 2)
                 currency = i['currency']
                 wallet_admin = i['wallet_admin']
             wallet = message.text.lower()
@@ -175,6 +181,7 @@ async def sell_step_wallet(message: Message, state: FSMContext):
                                                               f" в комментарии к транзакции укажите ваше имя в TG",
                                    reply_markup=menu_basic)
             await Sell.step_pay.set()
+
     except:
         await bot.send_message(message.from_user.id, 'Произошла ошибка', reply_markup=seller_menu)
         await state.finish()
@@ -184,17 +191,18 @@ async def sell_step_wallet(message: Message, state: FSMContext):
 async def sell_step_pay(message: Message, state: FSMContext):
     data = await state.get_data()
     if message.text == 'Оплатить и выставить' or message.text == '/start' or message.text == '/help' or message.text == '/admin':
-            await db.add_good(message.from_user.id, message.from_user.username, data.get('name'), data.get('quantity'),
-                              data.get('currency'), data.get('rate'), data.get('wallet'))
-            await bot.send_message(admin_id,
-                                   text=f'Пользователь {message.from_user.username} проверяет оплату '
-                                        f'на выставление товара {data.get("name")}',
-                                   reply_markup=genmarkup(message.from_user.id, data.get('name')))
-            await bot.send_message(message.from_user.id,
-                                   text='В скором времени администраторы проверят вашу оплату '
-                                        'и выставят ваш слот на продажу\n'
-                                        'Проверить выставленный товар можно в меню "Мои товары"',
-                                   reply_markup=menu_back_main)
+        await db.add_good(message.from_user.id, message.from_user.username, data.get('name'),
+                          round(data.get('quantity'), 2),
+                          data.get('currency'), round(data.get('rate'), 2), data.get('wallet'))
+        await bot.send_message(admin_id,
+                               text=f'Пользователь {message.from_user.username} проверяет оплату '
+                                    f'на выставление товара {data.get("name")}',
+                               reply_markup=genmarkup(message.from_user.id, data.get('name')))
+        await bot.send_message(message.from_user.id,
+                               text='В скором времени администраторы проверят вашу оплату '
+                                    'и выставят ваш слот на продажу\n'
+                                    'Проверить выставленный товар можно в меню "Мои товары"',
+                               reply_markup=menu_back_main)
     else:
         await bot.send_message(message.from_user.id, text='товар удален', reply_markup=menu_back_main)
     await state.finish()
